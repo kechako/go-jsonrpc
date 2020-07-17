@@ -1,0 +1,55 @@
+= go-jsonrpc
+
+go-jsonrpc is a JSON-RPC 2.0 client that communicates over HTTP in Go.
+
+== Install
+
+[source, console]
+----
+$ go get github.com/kechako/go-jsonrpc
+----
+
+=== Usage
+
+[source, golang]
+----
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/kechako/go-jsonrpc"
+)
+
+type Query struct {
+	Email string
+}
+
+type Result struct {
+	ID      uint64
+	Name    string
+	Address string
+}
+
+func main() {
+	c := &jsonrpc.Client{}
+
+	q := &Query{
+		Email: "test@example.com",
+	}
+
+	header := make(http.Header)
+	header.Add("X-Custom-Header", "XXXX")
+
+	var res Result
+	err := c.Call(context.Background(), "https://example.com/jsonrpc", "query", q, &res, jsonrpc.WithHeader(header))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(res.ID, res.Name, res.Address)
+}
+----
